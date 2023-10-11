@@ -66,9 +66,14 @@ public class CameraController : MonoBehaviour
         float camera_difference = (camera_size - 15f) / 4f;
 
         Vector3 new_scale = startingScale * (15f + camera_difference) / 15f;
-        
 
         Sky.transform.localScale = new_scale;
+
+        //Moving the sky at 75% the speed of the camera
+        Vector3 new_position = transform.position * 0.75f;
+
+        Sky.transform.position = new_position;
+
     }
 
 
