@@ -388,10 +388,11 @@ GameObject:
   m_Component:
   - component: {fileID: 1118181094}
   - component: {fileID: 1118181093}
-  - component: {fileID: 1118181096}
   - component: {fileID: 1118181095}
   - component: {fileID: 1118181097}
-  m_Layer: 0
+  - component: {fileID: 1118181098}
+  - component: {fileID: 1118181096}
+  m_Layer: 6
   m_Name: Weevil
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -477,15 +478,15 @@ Rigidbody2D:
   m_UseAutoMass: 0
   m_Mass: 1
   m_LinearDrag: 0
-  m_AngularDrag: 0.05
+  m_AngularDrag: 0.15
   m_GravityScale: 1
   m_Material: {fileID: 0}
   m_Interpolate: 0
   m_SleepingMode: 1
   m_CollisionDetection: 0
   m_Constraints: 0
---- !u!61 &1118181096
-BoxCollider2D:
+--- !u!70 &1118181096
+CapsuleCollider2D:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
@@ -497,19 +498,9 @@ BoxCollider2D:
   m_IsTrigger: 0
   m_UsedByEffector: 0
   m_UsedByComposite: 0
-  m_Offset: {x: 0, y: 0.012039602}
-  m_SpriteTilingProperty:
-    border: {x: 0, y: 0, z: 0, w: 0}
-    pivot: {x: 0.5, y: 0.5}
-    oldSize: {x: 3.35, y: 1.88}
-    newSize: {x: 3.35, y: 1.88}
-    adaptiveTilingThreshold: 0.5
-    drawMode: 0
-    adaptiveTiling: 0
-  m_AutoTiling: 0
-  serializedVersion: 2
-  m_Size: {x: 3.35, y: 1.8559207}
-  m_EdgeRadius: 0
+  m_Offset: {x: -0.19330314, y: -0.058679983}
+  m_Size: {x: 3.234467, y: 1.6979734}
+  m_Direction: 1
 --- !u!114 &1118181097
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -522,6 +513,32 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c895a0c27ab934bd4a0c7f7ee0183892, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+--- !u!61 &1118181098
+BoxCollider2D:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1118181092}
+  m_Enabled: 1
+  m_Density: 1
+  m_Material: {fileID: 0}
+  m_IsTrigger: 1
+  m_UsedByEffector: 0
+  m_UsedByComposite: 0
+  m_Offset: {x: 0.02085352, y: -0.83413583}
+  m_SpriteTilingProperty:
+    border: {x: 0, y: 0, z: 0, w: 0}
+    pivot: {x: 0.5, y: 0.5}
+    oldSize: {x: 3.35, y: 1.88}
+    newSize: {x: 3.35, y: 1.88}
+    adaptiveTilingThreshold: 0.5
+    drawMode: 0
+    adaptiveTiling: 0
+  m_AutoTiling: 0
+  serializedVersion: 2
+  m_Size: {x: 2.8495183, y: 0.5036758}
+  m_EdgeRadius: 0
 --- !u!1 &1197740226
 GameObject:
   m_ObjectHideFlags: 0
@@ -796,7 +813,7 @@ GameObject:
   - component: {fileID: 2009832156}
   - component: {fileID: 2009832155}
   - component: {fileID: 2009832157}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: Ground
   m_TagString: Untagged
   m_Icon: {fileID: 0}
