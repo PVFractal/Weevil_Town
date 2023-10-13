@@ -48,11 +48,8 @@ public class WeevilScript : MonoBehaviour
     private bool grounded = false;
 
 
-    public WeevilScript()
-    {
-        
 
-    }
+
 
     // Start is called before the first frame update
     void Start()
