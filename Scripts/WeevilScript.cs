@@ -42,6 +42,9 @@ public class WeevilScript : MonoBehaviour
     private int action_timer = ACTION_TIME;
     private int action_counter = 0;
 
+    private Sprite default_texture;
+    private Sprite armor_texture;
+
     
     //Action variables
     private string next_action = "";
@@ -49,6 +52,7 @@ public class WeevilScript : MonoBehaviour
     private bool grounded = false;
     private int moving = 0;
     private bool jumping = false;
+    private bool armored = false;
 
 
 
@@ -60,21 +64,21 @@ public class WeevilScript : MonoBehaviour
 
 
         //Default texture
-        Sprite texture = Resources.Load<Sprite>("Textures/Weevil");
+        default_texture = Resources.Load<Sprite>("Textures/Weevil");
         
         if (traits[0] == false && traits[1] == true)
         {
-            texture = Resources.Load<Sprite>("Textures/Evil_Weevil");
+            default_texture = Resources.Load<Sprite>("Textures/Evil_Weevil");
         }
         else if (traits[0] == true && traits[1] == false)
         {
-            texture = Resources.Load<Sprite>("Textures/Armor_Weevil");
+            default_texture = Resources.Load<Sprite>("Textures/Armor_Weevil");
         }
         else if (traits[0] == true && traits[1] == true)
         {
-            texture = Resources.Load<Sprite>("Textures/Evil_Armor_Weevil");
+            default_texture = Resources.Load<Sprite>("Textures/Evil_Armor_Weevil");
         }
-        gameObject.GetComponent<SpriteRenderer>().sprite = texture;
+        gameObject.GetComponent<SpriteRenderer>().sprite = default_texture;
 
         //Scaling it down if it is supposed to be more agile
         if (traits[2] == true)
@@ -103,6 +107,8 @@ public class WeevilScript : MonoBehaviour
         //Setting the delay before the first action
         action_timer = Random.Range(0, ACTION_TIME);
 
+        //Loading the armor texture
+        armor_texture = Resources.Load<Sprite>("Textures/Curled_Weevil");
     }
 
 
@@ -165,6 +171,18 @@ public class WeevilScript : MonoBehaviour
                 case "jump":
                     jumping = true;
                     break;
+                case "armor":
+                    //Making sure the weevil has armor before it can do anything
+                    if (traits[0])
+                    {
+                        armored = true;
+                        gameObject.GetComponent<SpriteRenderer>().sprite = armor_texture;
+                        //Making sure the capsule collider disappears, which will shrink the physical body
+                        gameObject.GetComponent<CapsuleCollider2D>().enabled = false;
+                        //Making sure it can't physically roll
+                        gameObject.GetComponent<Rigidbody2D>().constraints = RigidbodyConstraints2D.FreezeRotation;
+                    }
+                    break;
 
             }
 
@@ -201,6 +219,13 @@ public class WeevilScript : MonoBehaviour
         moving = 0;
 
         jumping = false;
+
+        armored = false;
+
+        gameObject.GetComponent<SpriteRenderer>().sprite = default_texture;
+
+        gameObject.GetComponent<CapsuleCollider2D>().enabled = true;
+        gameObject.GetComponent<Rigidbody2D>().constraints = RigidbodyConstraints2D.None;
     }
 
 
