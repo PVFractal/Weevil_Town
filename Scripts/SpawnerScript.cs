@@ -27,7 +27,7 @@ public class SpawnerScript : MonoBehaviour
     private void SpawnWeevils()
     {
 
-        string[] actions = { "right", "right", "left", "left" };
+        string[] actions = { "right", "jump", "left", "jump" };
         string[] reactions = { "jump", "armor" };
         bool[] traits = { true, false, false };
         bool[] traits2 = { false, false, true };

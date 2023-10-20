@@ -30,8 +30,9 @@ public class WeevilScript : MonoBehaviour
 
     //Constants
     const int ACTION_TIME = 100;
-    const int MIN_ACTION_TIME = 20;
+    const int REACTION_TIME = 80;
     const float WEEVIL_SPEED = 3f;
+    const float JUMP_HEIGHT = 8f;
 
     //This is a constant set by physical traits
     private float SPEED_MODIFIER = 1f;
@@ -41,12 +42,13 @@ public class WeevilScript : MonoBehaviour
     private int action_timer = ACTION_TIME;
     private int action_counter = 0;
 
-    private int moving = 0;
-
+    
+    //Action variables
     private string next_action = "";
 
     private bool grounded = false;
-
+    private int moving = 0;
+    private bool jumping = false;
 
 
 
@@ -137,8 +139,8 @@ public class WeevilScript : MonoBehaviour
                 }
             }
 
+            //Making sure that actions don't carry over
             stopActions();
-
 
             Vector3 previous_scale = transform.localScale;
 
@@ -160,6 +162,10 @@ public class WeevilScript : MonoBehaviour
                     transform.localScale = new Vector3(-Mathf.Abs(previous_scale.x), previous_scale.y);
 
                     break;
+                case "jump":
+                    jumping = true;
+                    break;
+
             }
 
             //Clearing the action
@@ -179,6 +185,12 @@ public class WeevilScript : MonoBehaviour
             Vector2 previous_velocity = gameObject.GetComponent<Rigidbody2D>().velocity;
             gameObject.GetComponent<Rigidbody2D>().velocity = new Vector2(moving * WEEVIL_SPEED * SPEED_MODIFIER, previous_velocity.y);
         }
+        if (jumping && grounded)
+        {
+            Vector2 previous_velocity = gameObject.GetComponent<Rigidbody2D>().velocity;
+            gameObject.GetComponent<Rigidbody2D>().velocity = new Vector2(previous_velocity.x, JUMP_HEIGHT * SPEED_MODIFIER);
+            jumping = false;
+        }
 
     }
 
@@ -188,6 +200,7 @@ public class WeevilScript : MonoBehaviour
         //Stopping movement
         moving = 0;
 
+        jumping = false;
     }
 
 
