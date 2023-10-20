@@ -212,4 +212,20 @@ public class WeevilScript : MonoBehaviour
         }
     }
 
+
+    //These next three functions are for setting the options
+    public void setActions(string[] actions)
+    {
+        this.actions = actions;
+    }
+    public void setReactions(string[] reactions)
+    {
+        this.reactions = reactions;
+    }
+    public void setTraits(bool[] traits)
+    {
+        this.traits = traits;
+    }
+
+
 }
