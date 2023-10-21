@@ -33,6 +33,7 @@ public class WeevilScript : MonoBehaviour
     const int REACTION_TIME = 80;
     const float WEEVIL_SPEED = 3f;
     const float JUMP_HEIGHT = 8f;
+    const float BULLET_SPEED = 15f;
 
     //This is a constant set by physical traits
     private float SPEED_MODIFIER = 1f;
@@ -44,6 +45,10 @@ public class WeevilScript : MonoBehaviour
 
     private Sprite default_texture;
     private Sprite armor_texture;
+
+
+    //Laser prefab
+    public GameObject laserPrefab;
 
     
     //Action variables
@@ -172,18 +177,14 @@ public class WeevilScript : MonoBehaviour
                     jumping = true;
                     break;
                 case "armor":
-                    //Making sure the weevil has armor before it can do anything
-                    if (traits[0])
-                    {
-                        armored = true;
-                        gameObject.GetComponent<SpriteRenderer>().sprite = armor_texture;
-                        //Making sure the capsule collider disappears, which will shrink the physical body
-                        gameObject.GetComponent<CapsuleCollider2D>().enabled = false;
-                        //Making sure it can't physically roll
-                        gameObject.GetComponent<Rigidbody2D>().constraints = RigidbodyConstraints2D.FreezeRotation;
-                    }
+                    startArmor();
                     break;
-
+                case "shoot":
+                    shoot();
+                    break;
+                case "none":
+                    //Sometimes it might just need to do nothing
+                    break;
             }
 
             //Clearing the action
@@ -193,6 +194,51 @@ public class WeevilScript : MonoBehaviour
 
 
     }
+
+    //This funtion makes the weevil shoot a laser from its eyes
+    private void shoot()
+    {
+        //Making sure it has laser eyes before it shoots
+        if (traits[1] == false) { return; }
+
+        //Creating the gameobject
+        GameObject newLaser = Instantiate(laserPrefab);
+
+        //Getting the position to shoot from
+        Transform EyePosition = transform.GetChild(0);
+
+        newLaser.transform.position = EyePosition.position;
+
+
+        //Getting the direction
+        float direction_multiplier = 1f;
+
+        if (transform.localScale.x < 0)
+        {
+            direction_multiplier = -1f;
+        }
+
+        //Setting the speed
+        newLaser.GetComponent<Rigidbody2D>().velocity = new Vector2(BULLET_SPEED * direction_multiplier, 0);
+
+
+    }
+
+    //Function in charge of making the weevil curl up with armor
+    private void startArmor()
+    {
+        //Making sure the weevil has armor before it can do anything
+        if (traits[0])
+        {
+            armored = true;
+            gameObject.GetComponent<SpriteRenderer>().sprite = armor_texture;
+            //Making sure the capsule collider disappears, which will shrink the physical body
+            gameObject.GetComponent<CapsuleCollider2D>().enabled = false;
+            //Making sure it can't physically roll
+            gameObject.GetComponent<Rigidbody2D>().constraints = RigidbodyConstraints2D.FreezeRotation;
+        }
+    }
+
 
     //This function is in charge of continuous actions, such as moving
     private void completeActions()
