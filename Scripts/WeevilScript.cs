@@ -34,6 +34,7 @@ public class WeevilScript : MonoBehaviour
     const float WEEVIL_SPEED = 3f;
     const float JUMP_HEIGHT = 8f;
     const float BULLET_SPEED = 15f;
+    const float RAYCAST_LENGTH = 0.1f;
 
     //This is a constant set by physical traits
     private float SPEED_MODIFIER = 1f;
@@ -54,7 +55,6 @@ public class WeevilScript : MonoBehaviour
     //Action variables
     private string next_action = "";
 
-    private bool grounded = false;
     private int moving = 0;
     private bool jumping = false;
     private bool armored = false;
@@ -244,12 +244,12 @@ public class WeevilScript : MonoBehaviour
     private void completeActions()
     {
         //Moving the weevil along the ground if that is it's current action
-        if (moving != 0 && grounded)
+        if (moving != 0 && grounded())
         {
             Vector2 previous_velocity = gameObject.GetComponent<Rigidbody2D>().velocity;
             gameObject.GetComponent<Rigidbody2D>().velocity = new Vector2(moving * WEEVIL_SPEED * SPEED_MODIFIER, previous_velocity.y);
         }
-        if (jumping && grounded)
+        if (jumping && grounded())
         {
             Vector2 previous_velocity = gameObject.GetComponent<Rigidbody2D>().velocity;
             gameObject.GetComponent<Rigidbody2D>().velocity = new Vector2(previous_velocity.x, JUMP_HEIGHT * SPEED_MODIFIER);
@@ -274,25 +274,97 @@ public class WeevilScript : MonoBehaviour
         gameObject.GetComponent<Rigidbody2D>().constraints = RigidbodyConstraints2D.None;
     }
 
-
-    //This is called once per frame when the trigger is touching another collider
-    private void OnTriggerStay2D(Collider2D collision)
+    //This function determines whether or not the weevil is on the ground or not
+    private bool grounded()
     {
-        //7 is the layer of the ground, so now we know if the weevil is touching the ground
-        if (collision.gameObject.layer == 7)
+        //Getting what the raycast should hit
+        LayerMask layer = LayerMask.GetMask("Ground");
+
+        //Getting the positions to start raycast from
+        Vector3 leg1 = transform.GetChild(1).transform.position;
+        Vector3 leg2 = transform.GetChild(2).transform.position;
+        Vector3 leg3 = transform.GetChild(3).transform.position;
+
+        //Getting the raycasts from each leg
+        RaycastHit2D leg1_hit = Physics2D.Raycast(leg1, -Vector2.up, RAYCAST_LENGTH, layer);
+        RaycastHit2D leg2_hit = Physics2D.Raycast(leg2, -Vector2.up, RAYCAST_LENGTH, layer);
+        RaycastHit2D leg3_hit = Physics2D.Raycast(leg3, -Vector2.up, RAYCAST_LENGTH, layer);
+
+        if (leg1_hit || leg2_hit || leg3_hit)
         {
-            grounded = true;
+            return true;
         }
+
+        return false;
     }
 
-    //This is called when the trigger leaves a collider
-    private void OnTriggerExit2D(Collider2D collision)
+
+    //This event will be triggered once the outer collider of the weevil hits something
+    //We will use this to make the weevil react to things
+    private void OnTriggerEnter2D(Collider2D collision)
     {
-        //If the weevil's trigger is no longer touching the ground,
-        //then we need to update the variable to say so
-        if (collision.gameObject.layer == 7)
+        //In this case, we only want there to be a reaction if we aren't already reacting to something else
+        if (next_action == "")
         {
-            grounded = false;
+
+            //Layers 8 and 9 are all things the weevil needs to react to
+            if (collision.gameObject.layer == 9 || collision.gameObject.layer == 8)
+            {
+
+                //Layer 8 is danger
+                if (collision.gameObject.layer == 8)
+                {
+                    //Reactions[1] is the weevil's reaction to danger
+                    next_action = reactions[1];
+                }
+
+                //Layer 9 is food
+                if (collision.gameObject.layer == 9)
+                {
+                    //Reactions[0] is the weevil's reaction to food
+                    next_action = reactions[0];
+                }
+
+
+                //In the event that the reaction demands going a certain direction,
+                //we need to translate that to completable actions
+                if (next_action == "away")
+                {
+                    //In this case, we need to go left
+                    if (collision.transform.position.x > transform.position.x)
+                    {
+                        next_action = "left";
+                    }
+                    else
+                    {
+                        //Otherwise right
+                        next_action = "right";
+                    }
+                }
+                if (next_action == "towards")
+                {
+                    //In this case, we need to go right
+                    if (collision.transform.position.x > transform.position.x)
+                    {
+                        next_action = "right";
+                    }
+                    else
+                    {
+                        //Otherwise left
+                        next_action = "left";
+                    }
+                }
+
+                //Making the weevil not react if the reaction is "none"
+                if (next_action == "none")
+                {
+                    next_action = "";
+                    return;
+                }
+                //Since it is a reaction, the weevil will act quicker
+                action_timer -= REACTION_TIME;
+            }
+
         }
     }
 
