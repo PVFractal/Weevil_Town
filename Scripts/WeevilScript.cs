@@ -36,6 +36,13 @@ public class WeevilScript : MonoBehaviour
     const float BULLET_SPEED = 15f;
     const float RAYCAST_LENGTH = 0.1f;
 
+    const int FULL_FOOD = 15 * 60;
+    const int FULL_FOOD_DECREASED = 12 * 60;
+    const int FOOD_VALUE = 10 * 60;
+
+    const int DEATH_SPEED = 60;
+
+
     //This is a constant set by physical traits
     private float SPEED_MODIFIER = 1f;
 
@@ -44,8 +51,14 @@ public class WeevilScript : MonoBehaviour
     private int action_timer = ACTION_TIME;
     private int action_counter = 0;
 
+    private int food_level = FULL_FOOD;
+
     private Sprite default_texture;
     private Sprite armor_texture;
+
+    private int death_level = 0;
+
+    private int life_score = 0;
 
 
     //Laser prefab
@@ -58,6 +71,9 @@ public class WeevilScript : MonoBehaviour
     private int moving = 0;
     private bool jumping = false;
     private bool armored = false;
+    private bool dying = false;
+
+
 
 
 
@@ -114,12 +130,36 @@ public class WeevilScript : MonoBehaviour
 
         //Loading the armor texture
         armor_texture = Resources.Load<Sprite>("Textures/Curled_Weevil");
+
+        //Making sure the weevils are full
+        food_level = FULL_FOOD;
+
+        //If it is the smaller, quicker weevil, then it can't hold nearly as much food
+        if (traits[2])
+        {
+            food_level = FULL_FOOD_DECREASED;
+        }
+
+
+        //It takes two seconds for a weevil to die
+        death_level = 120;
+
+        life_score = 0;
+
     }
 
 
     // FixedUpdate is called at regular intervals
     void FixedUpdate()
     {
+        food_level -= 1;
+        if (food_level <= 0)
+        {
+            dying = true;
+        }
+
+        life_score += 1;
+
         startActions();
         completeActions();
     }
@@ -256,6 +296,23 @@ public class WeevilScript : MonoBehaviour
             jumping = false;
         }
 
+        if (dying)
+        {
+            death_level -= 1;
+
+
+
+            float death_ratio = (float)death_level / (float)DEATH_SPEED;
+
+            GetComponent<SpriteRenderer>().color = new Color(1, 1, 1, death_ratio);
+
+            if (death_level <= 0)
+            {
+                die();
+            }
+        }
+        
+
     }
 
     //This function is in charge of stopping the weevil's current action
@@ -366,6 +423,71 @@ public class WeevilScript : MonoBehaviour
             }
 
         }
+    }
+
+    //This will be called when the weevil hits something that is solid
+    private void OnCollisionEnter2D(Collision2D collision)
+    {
+        //This means the weevil has hit something dangerous
+        if (collision.gameObject.layer == 8)
+        {
+            if (!armored)
+            {
+                dying = true;
+            }
+        }
+
+        //This means the weevil has found food
+        if (collision.gameObject.layer == 9)
+        {
+            
+            //Checking to make sure the weevil isn't full before it eats
+            if (traits[2])
+            {
+                //The smaller weevils can't handle as much food
+                if (food_level >= FULL_FOOD_DECREASED)
+                {
+                    return;
+                }
+            }
+            else
+            {
+                //Bigger weevils can
+                if (food_level >= FULL_FOOD)
+                {
+                    return;
+                }
+            }
+
+            food_level += FOOD_VALUE;
+            //Killing the donut
+            collision.gameObject.GetComponent<DonutScript>().die();
+        }
+
+    }
+
+    //In the event that the weevil is touching something dangerous,
+    //and lets go of armor, it should die
+    private void OnCollisionStay2D(Collision2D collision)
+    {
+        //This means the weevil is touching something dangerous
+        if (collision.gameObject.layer == 8)
+        {
+            if (!armored)
+            {
+                dying = true;
+            }
+        }
+    }
+
+    //This function causes the weevil to die
+    private void die()
+    {
+        //Giving the spawner weevil data
+        GameObject.Find("Weevil Spawner").GetComponent<SpawnerScript>().acceptDeadWeevil(actions, reactions, traits, life_score);
+
+        //Truly destroying the weevil
+        Destroy(gameObject);
     }
 
 

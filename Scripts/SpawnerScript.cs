@@ -1,3 +1,10 @@
+/*
+ * This file is in charge of starting the round and ending the round
+ * It will load data from a file to spawn the new generation of weevils,
+ * and write to a file with how well the old generation of weevils did.
+ */
+
+
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -12,25 +19,28 @@ public class SpawnerScript : MonoBehaviour
 
     private string[] REACTION_OPTIONS = { "away", "towards", "jump", "shoot", "armor", "none", "none", "none", "none", "none", "none"};
 
+
+    private List<WeevilGenetics> deadWeevils;
+
+
     //Weevil to copy for creation
     public GameObject WeevilObject;
 
     // Start is called before the first frame update
     void Start()
     {
-        SpawnWeevils();
-    }
 
-    // Update is called once per frame
-    void Update()
-    {
-        
+        //Allocating space for the list
+        deadWeevils = new List<WeevilGenetics>();
+
+
+        SpawnWeevils();
     }
 
     //This is the main function that spawns all the weevils
     private void SpawnWeevils()
     {
-
+        
         spawnRandomWeevils();
 
         //Hiding the Weevil Spawner
@@ -44,12 +54,13 @@ public class SpawnerScript : MonoBehaviour
         //Not much of a function right now, but might be more complicated later
         for (int i = 0; i < POP_SIZE; i++)
         {
-            spawnRandomWeevil();
+            var newWeevil = getRandomWeevil();
+            spawnIndivdualWeevil(newWeevil.actions, newWeevil.reactions, newWeevil.traits);
         }
     }
 
-    //Spawns a single weevil with random characteristics
-    private void spawnRandomWeevil()
+    //Returns random weevil genetics
+    private WeevilGenetics getRandomWeevil()
     {
         string[] actions = { "none", "none", "none", "none" };
         string[] reactions = { "none", "none" };
@@ -86,9 +97,8 @@ public class SpawnerScript : MonoBehaviour
 
         }
 
+        return new WeevilGenetics(actions, reactions, traits, 0);
 
-
-        spawnIndivdualWeevil(actions, reactions, traits);
     }
 
 
@@ -107,4 +117,28 @@ public class SpawnerScript : MonoBehaviour
         //Setting the weevil's position to the spawner's position
         newWeevil.transform.position = transform.position;
     }
+
+    //Every time a weevil dies, it should send the data here
+    public void acceptDeadWeevil(string[] actions, string[] reactions, bool[] traits, int score)
+    {
+        var newDeadWeevil = new WeevilGenetics(actions, reactions, traits, score);
+        //Putting the newly dead weevil into the list
+        deadWeevils.Add(newDeadWeevil);
+        //This means all the weevils have died
+        if (deadWeevils.Count == POP_SIZE)
+        {
+            endGame();
+        }
+    }
+
+    //This is in charge of saving data and ending the round
+    private void endGame()
+    {
+        FileHandler writer = new FileHandler();
+
+        writer.saveData(deadWeevils);
+
+    }
+
+
 }
