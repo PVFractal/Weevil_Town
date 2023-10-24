@@ -28,6 +28,10 @@ public class WeevilGenetics
         this.score = score;
 	}
 
+    public WeevilGenetics()
+    {
+    }
+
 
 }
 
