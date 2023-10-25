@@ -16,6 +16,9 @@ public class SpawnerScript : MonoBehaviour
     //Constants
     const int POP_SIZE = 10;
 
+    const int MIN_ACTION_TIME = 20;
+    const int MAX_ACTION_TIME = 200;
+
     private string[] ACTION_OPTIONS = {"right", "left", "jump", "shoot", "armor", "none"};
 
     private string[] REACTION_OPTIONS = { "away", "towards", "jump", "shoot", "armor", "none", "none", "none", "none", "none", "none"};
@@ -85,7 +88,7 @@ public class SpawnerScript : MonoBehaviour
             //Spawning all the weevils into the game
             foreach (var newWeevil in newGeneration)
             {
-                spawnIndivdualWeevil(newWeevil.actions, newWeevil.reactions, newWeevil.traits);
+                spawnIndivdualWeevil(newWeevil.actions, newWeevil.action_times, newWeevil.reactions, newWeevil.traits);
             }
 
         }
@@ -109,7 +112,7 @@ public class SpawnerScript : MonoBehaviour
         for (int i = 0; i < POP_SIZE; i++)
         {
             var newWeevil = getRandomWeevil();
-            spawnIndivdualWeevil(newWeevil.actions, newWeevil.reactions, newWeevil.traits);
+            spawnIndivdualWeevil(newWeevil.actions, newWeevil.action_times, newWeevil.reactions, newWeevil.traits);
         }
     }
 
@@ -117,6 +120,7 @@ public class SpawnerScript : MonoBehaviour
     private WeevilGenetics getRandomWeevil()
     {
         string[] actions = { "none", "none", "none", "none", "none", "none", "none", "none" };
+        int[] action_times = { 100, 100, 100, 100, 100, 100, 100, 100 };
         string[] reactions = { "none", "none" };
         bool[] traits = { false, false, false };
 
@@ -128,6 +132,16 @@ public class SpawnerScript : MonoBehaviour
 
             //Setting the action to a random action
             actions[i] = ACTION_OPTIONS[r];
+        }
+
+        //Setting the action times
+        for (int i = 0; i < actions.Length; i++)
+        {
+            //Getting a random index
+            int time = Random.Range(MIN_ACTION_TIME, MAX_ACTION_TIME);
+
+            //Setting the time to a random time
+            action_times[i] = time;
         }
 
         //Setting the reactions
@@ -151,13 +165,13 @@ public class SpawnerScript : MonoBehaviour
 
         }
 
-        return new WeevilGenetics(actions, reactions, traits, 0);
+        return new WeevilGenetics(actions, action_times, reactions, traits, 0);
 
     }
 
 
     //This function will spawn a single weevil given genetic traits
-    private void spawnIndivdualWeevil(string[] actions, string[] reactions, bool[] traits)
+    private void spawnIndivdualWeevil(string[] actions, int[] action_times, string[] reactions, bool[] traits)
     {
 
         //Creating the new object from the template (WeevilObject)
@@ -165,6 +179,7 @@ public class SpawnerScript : MonoBehaviour
 
         //Assigning it the genetic traits
         newWeevil.GetComponent<WeevilScript>().setActions(actions);
+        newWeevil.GetComponent<WeevilScript>().setActionTimes(action_times);
         newWeevil.GetComponent<WeevilScript>().setReactions(reactions);
         newWeevil.GetComponent<WeevilScript>().setTraits(traits);
 
@@ -173,9 +188,9 @@ public class SpawnerScript : MonoBehaviour
     }
 
     //Every time a weevil dies, it should send the data here
-    public void acceptDeadWeevil(string[] actions, string[] reactions, bool[] traits, int score)
+    public void acceptDeadWeevil(string[] actions, int[] action_times, string[] reactions, bool[] traits, int score)
     {
-        var newDeadWeevil = new WeevilGenetics(actions, reactions, traits, score);
+        var newDeadWeevil = new WeevilGenetics(actions, action_times, reactions, traits, score);
         //Putting the newly dead weevil into the list
         deadWeevils.Add(newDeadWeevil);
         //This means all the weevils have died
@@ -221,6 +236,24 @@ public class SpawnerScript : MonoBehaviour
             {
                 child.actions[i] = weevil2.actions[i];
             }
+        }
+
+        //Combining the action times
+        for (int i = 0; i < 8; i++)
+        {
+            int randTime = 0;
+
+            if (weevil1.action_times[i] > weevil2.action_times[i])
+            {
+                randTime = Random.Range(weevil2.action_times[i], weevil1.action_times[i]);
+            }
+            else
+            {
+                randTime = Random.Range(weevil1.action_times[i], weevil2.action_times[i]);
+            }
+
+            child.action_times[i] = randTime;
+
         }
 
         //Combining the reactions

@@ -17,6 +17,9 @@ public class WeevilScript : MonoBehaviour
     //This determines the regular actions of the weevils
     private string[] actions = {"right", "right", "left", "left", "right", "right", "left", "left"};
 
+    //This determines how long the weevil actions last
+    private int[] action_times = { 100,100,100,100,100,100,100,100 };
+
     //This determines the reactions of the weevils to things
     //                             food    death    
     private string[] reactions = {"jump", "armor"};
@@ -29,8 +32,7 @@ public class WeevilScript : MonoBehaviour
     //************| Other things |****************
 
     //Constants
-    const int ACTION_TIME = 100;
-    const int REACTION_TIME = 80;
+    const int MIN_ACTION_TIME = 20;
     const float WEEVIL_SPEED = 3f;
     const float JUMP_HEIGHT = 8f;
     const float BULLET_SPEED = 15f;
@@ -48,7 +50,7 @@ public class WeevilScript : MonoBehaviour
 
 
     //Non-constants
-    private int action_timer = ACTION_TIME;
+    private int action_timer = 0;
     private int action_counter = 0;
 
     private int food_level = FULL_FOOD;
@@ -59,6 +61,8 @@ public class WeevilScript : MonoBehaviour
     private int death_level = 0;
 
     private int life_score = 0;
+
+    private int current_action_time = 0;
 
 
     //Laser prefab
@@ -126,7 +130,7 @@ public class WeevilScript : MonoBehaviour
         }
 
         //Setting the delay before the first action
-        action_timer = Random.Range(0, ACTION_TIME);
+        action_timer = Random.Range(0, 100);
 
         //Loading the armor texture
         armor_texture = Resources.Load<Sprite>("Textures/Curled_Weevil");
@@ -172,13 +176,15 @@ public class WeevilScript : MonoBehaviour
         action_timer--;
         if (action_timer <= 0)
         {
-            action_timer = ACTION_TIME;
+            
             //Now that the timer has reached 0, it is time to do the next action
 
             //If the next action hasn't been determined yet,
             //then the weevil should just do its next regular action.
             if (next_action == "")
             {
+                action_timer = action_times[action_counter];
+
                 next_action = actions[action_counter];
 
                 //Incrementing the action counter,
@@ -189,6 +195,15 @@ public class WeevilScript : MonoBehaviour
                     action_counter = 0;
                 }
             }
+            else
+            {
+                //Setting the timer to the default time in case the weevil is reacting to something
+                action_timer = 100;
+
+            }
+
+            //Remembering what the current action time is
+            current_action_time = action_timer;
 
             //Making sure that actions don't carry over
             stopActions();
@@ -419,7 +434,11 @@ public class WeevilScript : MonoBehaviour
                     return;
                 }
                 //Since it is a reaction, the weevil will act quicker
-                action_timer -= REACTION_TIME;
+                //We need to make sure it doesn't immediately interrupt the previous action
+
+                int time_to_remove = current_action_time - MIN_ACTION_TIME;
+
+                action_timer -= time_to_remove;
             }
 
         }
@@ -512,7 +531,7 @@ public class WeevilScript : MonoBehaviour
     private void die()
     {
         //Giving the spawner weevil data
-        GameObject.Find("Weevil Spawner").GetComponent<SpawnerScript>().acceptDeadWeevil(actions, reactions, traits, life_score);
+        GameObject.Find("Weevil Spawner").GetComponent<SpawnerScript>().acceptDeadWeevil(actions, action_times, reactions, traits, life_score);
 
         //Truly destroying the weevil
         Destroy(gameObject);
@@ -523,6 +542,10 @@ public class WeevilScript : MonoBehaviour
     public void setActions(string[] actions)
     {
         this.actions = actions;
+    }
+    public void setActionTimes(int[] action_times)
+    {
+        this.action_times = action_times;
     }
     public void setReactions(string[] reactions)
     {

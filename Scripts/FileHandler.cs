@@ -31,6 +31,12 @@ public class FileHandler
 				writer.WriteLine(action);
 			}
 
+            //Writing all action times
+            foreach (var action_time in weevil.action_times)
+            {
+                writer.WriteLine(action_time);
+            }
+
             //Writing all reactions
             foreach (var reaction in weevil.reactions)
             {
@@ -83,6 +89,12 @@ public class FileHandler
             for (int j = 0; j < 8; j++)
             {
                 newWeevil.actions[j] = reader.ReadLine();
+            }
+
+            //Loading all the action times
+            for (int j = 0; j < 8; j++)
+            {
+                newWeevil.action_times[j] = int.Parse(reader.ReadLine());
             }
 
             //Loading all the reactions
