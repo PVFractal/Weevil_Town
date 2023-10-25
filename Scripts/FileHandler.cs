@@ -52,11 +52,13 @@ public class FileHandler
 		writer.Close();
 	}
 
-	public bool loadData(List<WeevilGenetics> weevilList, int POP_SIZE)
+	public bool loadData(List<WeevilGenetics> weevilList, int POP_SIZE, string later_data = "")
 	{
         //Getting which scene we are in
         int scene = PlayerPrefs.GetInt("Scene");
-        string current_file = "scene" + scene + ".txt";
+
+        //If later data is not "", then we are loading future generations
+        string current_file = "scene" + later_data + scene + ".txt";
 
 		StreamReader reader;
 
@@ -78,7 +80,7 @@ public class FileHandler
             WeevilGenetics newWeevil = new WeevilGenetics();
 
             //Loading all the actions
-            for (int j = 0; j < 4; j++)
+            for (int j = 0; j < 8; j++)
             {
                 newWeevil.actions[j] = reader.ReadLine();
             }
@@ -117,6 +119,8 @@ public class FileHandler
 
         return true;
 	}
+
+
 
 }
 

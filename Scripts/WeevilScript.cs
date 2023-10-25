@@ -15,7 +15,7 @@ public class WeevilScript : MonoBehaviour
     //************| Weevil traits |****************
 
     //This determines the regular actions of the weevils
-    private string[] actions = {"right", "right", "left", "left"};
+    private string[] actions = {"right", "right", "left", "left", "right", "right", "left", "left"};
 
     //This determines the reactions of the weevils to things
     //                             food    death    
@@ -142,7 +142,7 @@ public class WeevilScript : MonoBehaviour
 
 
         //It takes two seconds for a weevil to die
-        death_level = 120;
+        death_level = DEATH_SPEED;
 
         life_score = 0;
 
@@ -468,6 +468,7 @@ public class WeevilScript : MonoBehaviour
 
     //In the event that the weevil is touching something dangerous,
     //and lets go of armor, it should die
+    //This could also apply to situations where a weevil is touching food
     private void OnCollisionStay2D(Collision2D collision)
     {
         //This means the weevil is touching something dangerous
@@ -477,6 +478,33 @@ public class WeevilScript : MonoBehaviour
             {
                 dying = true;
             }
+        }
+
+        //This means the weevil is touching food
+        if (collision.gameObject.layer == 9)
+        {
+
+            //Checking to make sure the weevil isn't full before it eats
+            if (traits[2])
+            {
+                //The smaller weevils can't handle as much food
+                if (food_level >= FULL_FOOD_DECREASED)
+                {
+                    return;
+                }
+            }
+            else
+            {
+                //Bigger weevils can
+                if (food_level >= FULL_FOOD)
+                {
+                    return;
+                }
+            }
+
+            food_level += FOOD_VALUE;
+            //Killing the donut
+            collision.gameObject.GetComponent<DonutScript>().die();
         }
     }
 

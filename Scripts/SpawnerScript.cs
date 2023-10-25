@@ -66,10 +66,10 @@ public class SpawnerScript : MonoBehaviour
             //We will automatically add the best weevil to the new generation
             newGeneration.Add(bestWeevil);
 
-            //Making seven children from the best and second best
+            //Making seven children from the best and the next best ones
             for (int i = 0; i < 7; i++)
             {
-                WeevilGenetics babyWeevil = makeChild(bestWeevil, secondBestWeevil);
+                WeevilGenetics babyWeevil = makeChild(bestWeevil, pastGeneration[(POP_SIZE - 2) - i]);
                 newGeneration.Add(babyWeevil);
             }
 
@@ -116,7 +116,7 @@ public class SpawnerScript : MonoBehaviour
     //Returns random weevil genetics
     private WeevilGenetics getRandomWeevil()
     {
-        string[] actions = { "none", "none", "none", "none" };
+        string[] actions = { "none", "none", "none", "none", "none", "none", "none", "none" };
         string[] reactions = { "none", "none" };
         bool[] traits = { false, false, false };
 
@@ -208,7 +208,7 @@ public class SpawnerScript : MonoBehaviour
         WeevilGenetics child = new WeevilGenetics();
 
         //Combining the actions
-        for (int i = 0; i < 4; i++)
+        for (int i = 0; i < 8; i++)
         {
             //This boolean decides randomly which of the parent's genetics will be handed down
             bool decider = (Random.value > 0.5f);
@@ -256,6 +256,60 @@ public class SpawnerScript : MonoBehaviour
         }
 
         return child;
+    }
+
+
+    //*********************Public functions for setting and resetting************************//
+    public void restart()
+    {
+        FileHandler writer = new FileHandler();
+
+        //Making a list of random weevils
+        List<WeevilGenetics> randomList = new List<WeevilGenetics>();
+        for (int i = 0; i < POP_SIZE; i++)
+        {
+            randomList.Add(getRandomWeevil());
+        }
+
+        //Writing them to the file
+        writer.saveData(randomList);
+
+        //Getting the current scene
+        int scene = PlayerPrefs.GetInt("Scene");
+
+        //Restarting the scene/round
+        SceneManager.LoadScene("Scenario " + scene);
+
+
+    }
+
+    public void loadLaterData()
+    {
+        FileHandler handler = new FileHandler();
+
+        //Making a list of weevils
+        List<WeevilGenetics> laterGeneration = new List<WeevilGenetics>();
+
+        bool canLoad = handler.loadData(laterGeneration, POP_SIZE, "X");
+
+        if (canLoad)
+        {
+            //Saving the later generation to the current file
+            handler.saveData(laterGeneration);
+
+            //Getting the current scene
+            int scene = PlayerPrefs.GetInt("Scene");
+
+            //Restarting the scene/round
+            SceneManager.LoadScene("Scenario " + scene);
+
+        }
+        else
+        {
+            print("No future data");
+        }
+
+        
     }
 
 

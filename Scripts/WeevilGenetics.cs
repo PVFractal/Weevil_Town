@@ -8,7 +8,7 @@ public class WeevilGenetics
     //************| Weevil traits |****************
 
     //This determines the regular actions of the weevils
-    public string[] actions = { "right", "right", "left", "left" };
+    public string[] actions = { "right", "right", "left", "left", "right", "right", "left", "left" };
 
     //This determines the reactions of the weevils to things
     //                             food    death    
