@@ -7,6 +7,7 @@ public class DonutScript : MonoBehaviour
 
     public GameObject explosion;
 
+    public bool isFood;
 
     public void die()
     {

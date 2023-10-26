@@ -205,6 +205,13 @@ public class SpawnerScript : MonoBehaviour
     {
         FileHandler writer = new FileHandler();
 
+        deadWeevils.Sort(
+            delegate (WeevilGenetics w1, WeevilGenetics w2)
+            {
+                return w1.score.CompareTo(w2.score);
+            }
+        );
+
         writer.saveData(deadWeevils);
 
         //Getting the current scene

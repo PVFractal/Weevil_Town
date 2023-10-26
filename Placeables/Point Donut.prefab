@@ -13,7 +13,7 @@ GameObject:
   - component: {fileID: 4782141607943005015}
   - component: {fileID: 4782141607943005010}
   m_Layer: 9
-  m_Name: Donut
+  m_Name: Point Donut
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -74,7 +74,7 @@ SpriteRenderer:
   m_SortingLayer: -3
   m_SortingOrder: 0
   m_Sprite: {fileID: 21300000, guid: c24dfd6fb6f3848c2a4ee57da4114f68, type: 3}
-  m_Color: {r: 1, g: 1, b: 1, a: 1}
+  m_Color: {r: 1, g: 0.8707252, b: 0.6179246, a: 1}
   m_FlipX: 0
   m_FlipY: 0
   m_DrawMode: 0
@@ -113,4 +113,3 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   explosion: {fileID: 7240765088841898732, guid: 34ca1924fa7d0459d85e716e22bc770a, type: 3}
-  isFood: 1

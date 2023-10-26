@@ -42,6 +42,8 @@ public class WeevilScript : MonoBehaviour
     const int FULL_FOOD_DECREASED = 12 * 60;
     const int FOOD_VALUE = 10 * 60;
 
+    const int POINT_VALUE = 5 * 60;
+
     const int DEATH_SPEED = 60;
 
 
@@ -478,7 +480,16 @@ public class WeevilScript : MonoBehaviour
                 }
             }
 
-            food_level += FOOD_VALUE;
+            //Checking to see if the donut is food or points
+            if (collision.gameObject.GetComponent<DonutScript>().isFood)
+            {
+                food_level += FOOD_VALUE;
+            }
+            else
+            {
+                life_score += POINT_VALUE;
+            }
+
             //Killing the donut
             collision.gameObject.GetComponent<DonutScript>().die();
         }
@@ -521,7 +532,16 @@ public class WeevilScript : MonoBehaviour
                 }
             }
 
-            food_level += FOOD_VALUE;
+            //Checking to see if the donut is food or points
+            if (collision.gameObject.GetComponent<DonutScript>().isFood)
+            {
+                food_level += FOOD_VALUE;
+            }
+            else
+            {
+                life_score += POINT_VALUE;
+            }
+
             //Killing the donut
             collision.gameObject.GetComponent<DonutScript>().die();
         }
